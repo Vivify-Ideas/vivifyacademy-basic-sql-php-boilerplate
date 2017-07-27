@@ -1,20 +1,3 @@
-<?php
-    $servername = "127.0.0.1";
-    $username = "root";
-    $password = "root";
-    $dbname = "vivify_blog_3_dan";
-
-    try {
-        $connection = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-        // set the PDO error mode to exception
-        $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    }
-    catch(PDOException $e)
-    {
-        echo $e->getMessage();
-    }
-?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,38 +16,9 @@
 
     <div class="va-l-container">
         <main class="va-l-page-content">
-
-
-            <?php
-
-                if (isset($_GET['post_id'])) {
-
-                    $postId = $_GET['post_id'];
-
-                    // pripremamo upit
-                    $sql = "SELECT id, title, created_at, content, created_by FROM posts WHERE id = {$postId}";
-                    $statement = $connection->prepare($sql);
-
-                    // izvrsavamo upit
-                    $statement->execute();
-
-                    // zelimo da se rezultat vrati kao asocijativni niz.
-                    // ukoliko izostavimo ovu liniju, vratice nam se obican, numerisan niz
-                    $statement->setFetchMode(PDO::FETCH_ASSOC);
-
-                    // punimo promenjivu sa rezultatom upita
-                    $singlePost = $statement->fetch();
-
-                    // koristite var_dump kada god treba da proverite sadrzaj neke promenjive
-                    //            echo '<pre>';
-                    //            var_dump($singlePost);
-                    //            echo '</pre>';
-            ?>
-
-
             <article class="va-c-article">
                 <header>
-                    <h1><?php echo($singlePost['title']) ?></h1>
+                    <h1><a href="single-post.php" title="Post tile">Post tile</a></h1>
                     <h3>category: <strong>Sports</strong></h3>
                     <div class="va-c-article__meta">12.06.2017. by John Doe</div>
                 </header>
@@ -95,13 +49,6 @@
                         <div>Jedna je Crvena Zvezda!</div>
                     </div>
                 </div>
-
-                <?php
-                    } else {
-                        echo('post_id parameter was not sent through $_GET.');
-                    }
-                ?>
-
             </article>
         </main>
     </div>
