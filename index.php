@@ -3,8 +3,8 @@
     // obavezno ih ovde zamenite
     $servername = "127.0.0.1";
     $username = "root";
-    $password = "root";
-    $dbname = "vivify_blog_3_dan";
+    $password = "";
+    $dbname = "academy-blog";
 
     try {
         $connection = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
@@ -37,10 +37,9 @@
         <main class="va-l-page-content">
 
             <?php
-
                 // pripremamo upit
-                $sql = "SELECT id, title, created_at, content, created_by FROM posts ORDER BY created_at DESC LIMIT 3";
-                $statement = $connection->prepare($sql);
+                $sql1 = "SELECT *, COALESCE(posts.id, users.id) as id FROM posts JOIN users ON users.id = posts.user_id ORDER BY posts.id  LIMIT 3";
+                $statement = $connection->prepare($sql1);
 
                 // izvrsavamo upit
                 $statement->execute();
@@ -68,15 +67,12 @@
                             <h1><a href="single-post.php?post_id=<?php echo($post['id']) ?>"><?php echo($post['title']) ?></a></h1>
 
                             <!-- zameniti  datum i ime sa pravim imenom i datumom blog post-a iz baze -->
-                            <div class="va-c-article__meta">12. 6. 2017. by John Doe</div>
+                            <div class="va-c-article__meta"> <?php echo($post['created_at']) ?> by <?php echo($post['name']) ?></div>
                         </header>
 
                         <div>
                             <!-- zameniti ovaj privremeni (testni) text sa pravim sadrzajem blog post-a iz baze -->
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Incidunt vitae molestias rem
-                                repellendus commodi provident? Magnam, nobis quisquam perferendis consectetur deserunt
-                                laboriosam pariatur a, eum suscipit ratione iusto ullam aperiam quas quod culpa dolore
-                                corrupti voluptatem placeat enim commodi in.</p>
+                            <p> <?php echo($post['body']) ?></p>
                         </div>
                     </article>
 

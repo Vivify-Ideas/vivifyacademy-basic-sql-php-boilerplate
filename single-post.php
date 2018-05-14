@@ -3,8 +3,8 @@
     // obavezno ih ovde zamenite
     $servername = "127.0.0.1";
     $username = "root";
-    $password = "root";
-    $dbname = "vivify_blog_3_dan";
+    $password = "";
+    $dbname = "academy-blog";
 
     try {
         $connection = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
@@ -38,9 +38,14 @@
 
             <?php
                 if (isset($_GET['post_id'])) {
-
                     // pripremamo upit
-                    $sql = "SELECT id, title, created_at, content, created_by FROM posts WHERE posts.id = {$_GET['post_id']}";
+                    $sql =
+                    "SELECT *,
+                        COALESCE(posts.id, users.id) as id,
+                        COALESCE(posts.created_at, users.created_at) as created_at
+                    FROM posts
+                        JOIN users ON posts.user_id = users.id
+                    WHERE posts.id = {$_GET['post_id']}";
                     $statement = $connection->prepare($sql);
 
                     // izvrsavamo upit
@@ -55,7 +60,7 @@
 
                     // koristite var_dump kada god treba da proverite sadrzaj neke promenjive
                         echo '<pre>';
-                        var_dump($singlePost);
+                        // var_dump($singlePost);
                         echo '</pre>';
 
             ?>
@@ -65,37 +70,46 @@
                             <h1><?php echo $singlePost['title'] ?></h1>
 
                             <!-- zameniti privremenu kategoriju pravom kategorijom blog post-a iz baze -->
-                            <h3>category: <strong>Sports</strong></h3>
+                            <h3>category: <strong> Sports </strong></h3>
 
                             <!-- zameniti  datum i ime sa pravim imenom i datumom blog post-a iz baze -->
-                            <div class="va-c-article__meta">12.06.2017. by John Doe</div>
+                            <div class="va-c-article__meta"><?php echo $singlePost['created_at'] ?> by <?php echo $singlePost['name'] ?></div>
                         </header>
 
                         <!-- zameniti ovaj privremeni (testni) text sa pravim sadrzajem blog post-a iz baze -->
                         <div>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Incidunt vitae molestias rem
-                                repellendus commodi provident? Magnam, nobis quisquam perferendis consectetur deserunt
-                                laboriosam pariatur a, eum suscipit ratione iusto ullam aperiam quas quod culpa dolore
-                                corrupti voluptatem placeat enim commodi in.</p>
-                            <p>Vel quasi sunt rem unde ea repellat eveniet at officia totam. Provident ut harum
-                                temporibus impedit odio quam amet accusamus ad quisquam velit incidunt praesentium
-                                cupiditate consectetur repellendus, fugiat quidem, officiis laudantium autem possimus
-                                ullam minima adipisci itaque? Eos, minus!</p>
-                            <p>Veritatis exercitationem enim magnam deserunt velit facere quos ea hic quibusdam
-                                molestiae minus, earum reprehenderit error architecto cum cumque perferendis quas
-                                impedit rerum sapiente facilis debitis! Error, obcaecati ea illum beatae voluptate
-                                consequatur, iusto quam sapiente fugiat, exercitationem maiores similique?</p>
-                            <p>Magni provident ex, doloribus architecto labore corrupti numquam. Beatae cumque alias
-                                aliquam iste ratione dolore in, odio libero numquam nemo reprehenderit modi magnam a
-                                laboriosam, ab quidem itaque deserunt explicabo facere deleniti illum, fuga vitae.
-                                Officiis at laborum doloremque assumenda.</p>
+                            <?php echo $singlePost['body'] ?>
                         </div>
 
                         <footer>
                             <h3>tags:
 
                                 <!-- zameniti testne tagove sa pravim tagovima blog post-a iz baze -->
-                                <a>football</a>, <a>champions league</a>, <a>qualifiers</a>
+                                <?php
+                            $sqlTags =
+                                "SELECT * FROM posts RIGHT JOIN post_tag ON posts.id = post_tag.post_id RIGHT JOIN tags ON tags.id = post_tag.tag_id WHERE  posts.id = {$_GET['post_id']}";
+
+                            $statement = $connection->prepare($sqlTags);
+
+                            // izvrsavamo upit
+                            $statement->execute();
+
+                            // zelimo da se rezultat vrati kao asocijativni niz.
+                            // ukoliko izostavimo ovu liniju, vratice nam se obican, numerisan niz
+                            $statement->setFetchMode(PDO::FETCH_ASSOC);
+
+                            // punimo promenjivu sa rezultatom upita
+                            $tags = $statement->fetchAll();
+
+                            // koristite var_dump kada god treba da proverite sadrzaj neke promenjive
+                                echo '<pre>';
+                                var_dump($tags);
+                                echo '</pre>';
+
+                                foreach ($tags as $tag) {
+                            ?>
+                                <a><?php echo $tag['name']; ?>  </a> <br>
+                                <?php  } ?>
                             </h3>
                         </footer>
 
@@ -103,23 +117,34 @@
                             <h3>comments</h3>
 
                             <!-- zameniti testne komentare sa pravim komentarima koji pripadaju blog post-u iz baze -->
-                            <div class="single-comment">
-                                <div>posted by: <strong>Pera Peric</strong> on 15.06.2017.</div>
-                                <div>Provident ut harum temporibus impedit odio quam amet accusamus ad quisquam velit
-                                    incidunt praesentium cupiditate consectetur repellendus, fugiat quidem, officiis
-                                    laudantium autem possimus ullam minima adipisci itaque? Eos, minus!
-                                </div>
-                            </div>
-                            <div class="single-comment">
-                                <div>posted by: <strong>Mitar Miric</strong> on 18.06.2017.</div>
-                                <div>Incidunt praesentium cupiditate consectetur repellendus, fugiat quidem, officiis
-                                    laudantium autem possimus ullam minima adipisci itaque? Eos, minus!
-                                </div>
-                            </div>
-                            <div class="single-comment">
-                                <div>posted by: <strong>Dule Savic</strong> on 20.06.2017.</div>
-                                <div>Jedna je Crvena Zvezda!</div>
-                            </div>
+                            <?php
+                            $sqlComments =
+                                "SELECT * FROM comments WHERE comments.post_id = {$_GET['post_id']}";
+
+                            $statement = $connection->prepare($sqlComments);
+
+                            // izvrsavamo upit
+                            $statement->execute();
+
+                            // zelimo da se rezultat vrati kao asocijativni niz.
+                            // ukoliko izostavimo ovu liniju, vratice nam se obican, numerisan niz
+                            $statement->setFetchMode(PDO::FETCH_ASSOC);
+
+                            // punimo promenjivu sa rezultatom upita
+                            $comments = $statement->fetchAll();
+
+                            // koristite var_dump kada god treba da proverite sadrzaj neke promenjive
+                                echo '<pre>';
+                                // var_dump($singlePost);
+                                echo '</pre>';
+
+                                foreach ($comments as $comment) {
+                            ?>
+                                    <div class="single-comment">
+                                        <div>posted by: <strong>Pera Peric</strong> on <?php echo $comment['created_at'] ?></div>
+                                        <div> <?php echo $comment['body'] ?> </div>
+                                    </div>
+                                <?php } ?>
                         </div>
                     </article>
 
