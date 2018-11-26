@@ -103,7 +103,7 @@
 
                             // koristite var_dump kada god treba da proverite sadrzaj neke promenjive
                                 echo '<pre>';
-                                var_dump($tags);
+                                // var_dump($tags);
                                 echo '</pre>';
 
                                 foreach ($tags as $tag) {
@@ -119,7 +119,7 @@
                             <!-- zameniti testne komentare sa pravim komentarima koji pripadaju blog post-u iz baze -->
                             <?php
                             $sqlComments =
-                                "SELECT * FROM comments WHERE comments.post_id = {$_GET['post_id']}";
+                                "SELECT * FROM comments JOIN users ON comments.user_id = users.id WHERE comments.post_id = {$_GET['post_id']}";
 
                             $statement = $connection->prepare($sqlComments);
 
@@ -135,13 +135,13 @@
 
                             // koristite var_dump kada god treba da proverite sadrzaj neke promenjive
                                 echo '<pre>';
-                                // var_dump($singlePost);
+                                var_dump($comments );
                                 echo '</pre>';
 
                                 foreach ($comments as $comment) {
                             ?>
                                     <div class="single-comment">
-                                        <div>posted by: <strong>Pera Peric</strong> on <?php echo $comment['created_at'] ?></div>
+                                        <div>posted by: <strong><?php echo $comment['name'] ?> </strong> on <?php echo $comment['created_at'] ?></div>
                                         <div> <?php echo $comment['body'] ?> </div>
                                     </div>
                                 <?php } ?>
