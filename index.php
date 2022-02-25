@@ -39,7 +39,7 @@
             <?php
 
                 // pripremamo upit
-                $sql = "SELECT id, title, created_at, content, created_by FROM posts ORDER BY created_at DESC LIMIT 3";
+                $sql = "SELECT * FROM posts ORDER BY created_at DESC LIMIT 3";
                 $statement = $connection->prepare($sql);
 
                 // izvrsavamo upit
