@@ -3,8 +3,8 @@
     // obavezno ih ovde zamenite
     $servername = "127.0.0.1";
     $username = "root";
-    $password = "root";
-    $dbname = "vivify_blog_3_dan";
+    $password = "vivify123";
+    $dbname = "academy_blog";
 
     try {
         $connection = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
@@ -39,7 +39,11 @@
             <?php
 
                 // pripremamo upit
-                $sql = "SELECT * FROM posts ORDER BY created_at DESC LIMIT 3";
+                $sql = "SELECT users.username, posts.* 
+                FROM posts INNER JOIN users 
+                ON users.id = posts.user_id 
+                ORDER BY posts.created_at DESC LIMIT 3";
+
                 $statement = $connection->prepare($sql);
 
                 // izvrsavamo upit
@@ -53,9 +57,9 @@
                 $posts = $statement->fetchAll();
 
                 // koristite var_dump kada god treba da proverite sadrzaj neke promenjive
-                    echo '<pre>';
-                    var_dump($posts);
-                    echo '</pre>';
+                    // echo '<pre>';
+                    // var_dump($posts);
+                    // echo '</pre>';
 
             ?>
 
@@ -68,15 +72,12 @@
                             <h1><a href="single-post.php?post_id=<?php echo($post['id']) ?>"><?php echo($post['title']) ?></a></h1>
 
                             <!-- zameniti  datum i ime sa pravim imenom i datumom blog post-a iz baze -->
-                            <div class="va-c-article__meta">12. 6. 2017. by John Doe</div>
+                            <div class="va-c-article__meta"><?php echo ($post['created_at']) ?> by <?php echo ($post['username']) ?></div>
                         </header>
 
                         <div>
                             <!-- zameniti ovaj privremeni (testni) text sa pravim sadrzajem blog post-a iz baze -->
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Incidunt vitae molestias rem
-                                repellendus commodi provident? Magnam, nobis quisquam perferendis consectetur deserunt
-                                laboriosam pariatur a, eum suscipit ratione iusto ullam aperiam quas quod culpa dolore
-                                corrupti voluptatem placeat enim commodi in.</p>
+                            <p><?php echo ($post['content']) ?></p>
                         </div>
                     </article>
 
